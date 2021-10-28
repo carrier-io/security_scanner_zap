@@ -4,9 +4,5 @@
   "module": "plugins.security_scanner_zap",
   "extract": true,
   "depends_on": ["shared", "projects", "theme"],
-  "init_after": ["theme"],
-  "scanner_params": {
-    "target": "urls_to_scan",
-    "scan_types": "all"
-  }
+  "init_after": ["theme"]
 }

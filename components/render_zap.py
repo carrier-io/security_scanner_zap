@@ -1,9 +1,8 @@
-from flask import request, render_template
-import os
+from flask import render_template
 
 
-def render_zap_card(context, slot, payload):
+def render_qualys_reporter_toggle(context, slot, payload):
     return render_template(
-        f"zap_template.html",
+        "zap_reporter_toggle.html",
         config=payload
     )

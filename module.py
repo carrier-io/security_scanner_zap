@@ -16,6 +16,7 @@
 #   limitations under the License.
 
 """ Module """
+import functools
 from pathlib import Path
 
 import flask  # pylint: disable=E0401
@@ -24,7 +25,7 @@ from flask import request, render_template, redirect, url_for
 from pylon.core.tools import log  # pylint: disable=E0611,E0401
 from pylon.core.tools import module  # pylint: disable=E0611,E0401
 
-from .components.render_zap import render_zap_card
+from .components.render_zap import render_qualys_reporter_toggle
 
 
 class Module(module.ModuleModel):
@@ -48,11 +49,16 @@ class Module(module.ModuleModel):
         ])
         # Register in app
         self.context.app.register_blueprint(bp)
-        # Register template slot callback
-        self.context.slot_manager.register_callback("security_scanners", render_zap_card)
-
-        from .rpc_worker import get_scanner_parameters
-        self.context.rpc_manager.register_function(get_scanner_parameters, name='zap')
+        #
+        SECTION_NAME = 'scanners'
+        #
+        self.context.slot_manager.register_callback(f"security_{SECTION_NAME}", render_qualys_reporter_toggle)
+        #
+        from .rpc_worker import make_dusty_config
+        self.context.rpc_manager.register_function(
+            functools.partial(make_dusty_config, self.context),
+            name='zap',
+        )
 
     def deinit(self):  # pylint: disable=R0201
         """ De-init module """
