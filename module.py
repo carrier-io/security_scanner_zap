@@ -57,7 +57,7 @@ class Module(module.ModuleModel):
         from .rpc_worker import make_dusty_config
         self.context.rpc_manager.register_function(
             functools.partial(make_dusty_config, self.context),
-            name='zap',
+            name='dusty_config_zap',
         )
 
     def deinit(self):  # pylint: disable=R0201
