@@ -31,10 +31,9 @@ from .components.render_zap import render_qualys_reporter_toggle
 class Module(module.ModuleModel):
     """ Galloper module """
 
-    def __init__(self, settings, root_path, context):
-        self.settings = settings
-        self.root_path = root_path
+    def __init__(self, context, descriptor):
         self.context = context
+        self.descriptor = descriptor
 
     def init(self):
         """ Init module """
