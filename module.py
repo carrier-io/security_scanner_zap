@@ -37,7 +37,7 @@ class Module(module.ModuleModel):
 
     def init(self):
         """ Init module """
-        log.info("Initializing module")
+        log.info("Initializing module ZAP")
         bp = flask.Blueprint(
             "zap", "plugins.security_scanner_zap.plugin",
             static_folder=str(Path(__file__).parents[0] / "static"),
@@ -59,6 +59,11 @@ class Module(module.ModuleModel):
             name='dusty_config_zap',
         )
 
+        self.context.rpc_manager.call.integrations_register(
+            name='zap',
+            section=SECTION_NAME,
+        )
+
     def deinit(self):  # pylint: disable=R0201
         """ De-init module """
-        log.info("De-initializing module")
+        log.info("De-initializing module ZAP")
