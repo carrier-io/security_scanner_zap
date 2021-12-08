@@ -25,7 +25,7 @@ from flask import request, render_template, redirect, url_for
 from pylon.core.tools import log  # pylint: disable=E0611,E0401
 from pylon.core.tools import module  # pylint: disable=E0611,E0401
 
-from .components.render_zap import render_qualys_reporter_toggle
+from .components import render_toggle
 
 
 class Module(module.ModuleModel):
@@ -38,20 +38,12 @@ class Module(module.ModuleModel):
     def init(self):
         """ Init module """
         log.info("Initializing module ZAP")
-        bp = flask.Blueprint(
-            "zap", "plugins.security_scanner_zap.plugin",
-            static_folder=str(Path(__file__).parents[0] / "static"),
-            static_url_path='/zap/static/'
-        )
-        bp.jinja_loader = jinja2.ChoiceLoader([
-            jinja2.loaders.PackageLoader("plugins.security_scanner_zap", "templates"),
-        ])
-        # Register in app
-        self.context.app.register_blueprint(bp)
+
+        self.descriptor.init_blueprint()
         #
         SECTION_NAME = 'scanners'
         #
-        self.context.slot_manager.register_callback(f"security_{SECTION_NAME}", render_qualys_reporter_toggle)
+        self.context.slot_manager.register_callback(f"security_{SECTION_NAME}", render_toggle)
         #
         from .rpc_worker import make_dusty_config
         self.context.rpc_manager.register_function(
