@@ -56,7 +56,7 @@ class Module(module.ModuleModel):
         )
 
         self.context.rpc_manager.call.integrations_register(
-            name='zap',
+            name=self.descriptor.name,
             section=SECTION_NAME,
             settings_model=IntegrationModel,
             integration_callback=render_integration_create_modal
@@ -65,7 +65,7 @@ class Module(module.ModuleModel):
         from .rpc_worker import make_dusty_config
         self.context.rpc_manager.register_function(
             functools.partial(make_dusty_config, self.context),
-            name='dusty_config_zap',
+            name=f'dusty_config_{self.descriptor.name}',
         )
 
     def deinit(self):  # pylint: disable=R0201

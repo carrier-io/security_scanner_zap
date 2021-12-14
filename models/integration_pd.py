@@ -8,7 +8,7 @@ from pylon.core.tools import log
 
 class IntegrationModel(BaseModel):
 
-    scan_types: List[str] = ['all']
+    scan_types: List[str] = ['xss', 'sqli']
     auth_login: Optional[str] = 'user'
     auth_password: Optional[str] = 'P@ssw0rd'
     auth_script: Optional[str] = """
@@ -41,11 +41,11 @@ class IntegrationModel(BaseModel):
             return False
 
     @validator('scan_types')
-    def validate_scan_types(cls, value: str, field: ModelField):
-        assert value.lower() in ['all', 'xss', 'sqli'], f'Value [{value}] must be in ["all", "xss", "sqli"]'
-        return value.lower()
+    def validate_scan_types(cls, value: list, field: ModelField):
+        assert not set(value).difference({'xss', 'sqli'}), f'Valid scan types are: ["xss", "sqli"]'
+        return value
 
-    @validator('java_options')
-    def validate_java_options(cls, value: str, field: ModelField):
-        assert value.startswith('-'), ''
-        return value.lower()
+    # @validator('java_options')
+    # def validate_java_options(cls, value: str, field: ModelField):
+    #     assert value.startswith('-'), 'options must start with "-"'
+    #     return value.lower()
