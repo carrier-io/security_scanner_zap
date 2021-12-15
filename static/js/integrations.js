@@ -19,9 +19,6 @@ const Zap = {
         id: null,
 
         available_scan_types: ['xss', 'sqli'],
-        scan_types_all: {
-            indeterminate: false
-        },
         scan_types: ['xss', 'sqli'],
 
         auth_login: 'user',
@@ -33,15 +30,15 @@ const Zap = {
             "- {command: type, target: id=login_login, value: '%Username%'}\n" +
             "- {command: type, target: id=login_password, value: '%Password%'}\n" +
             "- {command: clickAndWait, target: id=login_0, value: ''}",
-        bind_all_interfaces: true,
-        daemon_debug: false,
+        // bind_all_interfaces: true,
+        // daemon_debug: false,
         java_options: '-Xmx1g',
-        split_by_endpoint: false,
+        // split_by_endpoint: false,
         passive_scan_wait_threshold: 0,
         passive_scan_wait_limit: 600,
-        external_zap_daemon: 'http://192.168.0.2:8091',
-        external_zap_api_key: 'dusty',
-        save_intermediates_to: '/data/intermediates/dast'
+        // external_zap_daemon: 'http://192.168.0.2:8091',
+        // external_zap_api_key: 'dusty',
+        // save_intermediates_to: '/data/intermediates/dast'
 
 
     }),
