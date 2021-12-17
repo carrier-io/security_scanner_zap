@@ -12,7 +12,9 @@
                 <label class="custom-toggle">
                     <input type="checkbox" data-target="#selector_{{ integration_name }}" aria-expanded="false"
                            data-toggle="collapse"
-                           class="integration_checkbox" id="integration_checkbox_{{ integration_name }}">
+                           class="integration_checkbox" id="integration_checkbox_{{ integration_name }}"
+                           v-model="toggle"
+                    >
                     <span class="custom-toggle-slider rounded-circle"></span>
                 </label>
             </div>

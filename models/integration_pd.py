@@ -1,5 +1,6 @@
 from typing import Optional, List
 
+import yaml
 from pydantic import BaseModel, AnyUrl
 from pydantic.class_validators import validator
 from pydantic.fields import ModelField
@@ -32,7 +33,6 @@ class IntegrationModel(BaseModel):
     external_zap_api_key: Optional[str] = 'dusty'
     save_intermediates_to: Optional[str] = '/data/intermediates/dast'
 
-
     def check_connection(self) -> bool:
         try:
             return True
@@ -42,7 +42,14 @@ class IntegrationModel(BaseModel):
 
     @validator('scan_types')
     def validate_scan_types(cls, value: list, field: ModelField):
-        assert not set(value).difference({'xss', 'sqli'}), f'Valid scan types are: ["xss", "sqli"]'
+        assert value, "At least one scan type must be selected"
+        assert not set(value).difference({'xss', 'sqli'}), 'Valid scan types are: ["xss", "sqli"]'
+        return value
+
+    @validator('auth_script')
+    def validate_auth_script(cls, value: str):
+        for i in yaml.safe_load(value):
+            assert all(k in i for k in ('command', 'target', 'value',)), 'All auth script commands must contain "command", "target" and "value"'
         return value
 
     # @validator('java_options')

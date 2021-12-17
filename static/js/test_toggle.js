@@ -1,38 +1,20 @@
-window['scanners_security_scanner_zap'] = {
-    get_data: () => {
-        if ($('#integration_checkbox_zap').prop('checked')) {
-            console.log('Getting data for zap')
-            return {}
-        }
-    },
-    set_data: data => {
-        console.log('Setting data for zap', data)
-        $('#integration_checkbox_zap').prop('checked', true)
-        zapVm.set_data(data)
-
-    },
-    clear_data: () => {
-        console.log('Clearing data for zap')
-        $('#integration_checkbox_zap').prop('checked', false)
-        zapVm.clear()
-    }
-}
-
 const zapInitialState = () => ({
-        id: null,
-        error: {},
+    toggle: false,
 
-        available_scan_types: ['xss', 'sqli'],
-        scan_types: [],
+    id: null,
+    error: {},
 
-        auth_login: '',
-        auth_password: '',
-        auth_script: '',
-        bind_all_interfaces: true,
-        daemon_debug: false,
-        java_options: '',
-        passive_scan_wait_threshold: 0,
-        passive_scan_wait_limit: 600,
+    available_scan_types: ['xss', 'sqli'],
+    scan_types: [],
+
+    auth_login: '',
+    auth_password: '',
+    auth_script: '',
+    bind_all_interfaces: true,
+    daemon_debug: false,
+    java_options: '',
+    passive_scan_wait_threshold: 0,
+    passive_scan_wait_limit: 600,
 })
 
 const zapApp = Vue.createApp({
@@ -44,14 +26,22 @@ const zapApp = Vue.createApp({
         }
     },
     mounted() {
-
+        window[`scanners_${this.pluginName}`] = {
+            get_data: () => this.toggle && this.body_data,
+            set_data: this.loadSettings,
+            clear_data: this.clear,
+        }
+        this.handleIntegrationSelect({target: this.zap_selectpicker})
     },
     computed: {
+        zap_selectpicker() {
+            return $(`#selector_${this.pluginName} .selectpicker`)
+        },
         body_data() {
             const {
                 description,
                 is_default,
-                project_id,
+                id,
 
                 scan_types,
                 auth_login,
@@ -60,17 +50,13 @@ const zapApp = Vue.createApp({
                 bind_all_interfaces,
                 daemon_debug,
                 java_options,
-                split_by_endpoint,
                 passive_scan_wait_threshold,
                 passive_scan_wait_limit,
-                external_zap_daemon,
-                external_zap_api_key,
-                save_intermediates_to,
             } = this
             return {
                 description,
                 is_default,
-                project_id,
+                id,
 
                 scan_types,
                 auth_login,
@@ -79,17 +65,18 @@ const zapApp = Vue.createApp({
                 bind_all_interfaces,
                 daemon_debug,
                 java_options,
-                split_by_endpoint,
                 passive_scan_wait_threshold,
                 passive_scan_wait_limit,
-                external_zap_daemon,
-                external_zap_api_key,
-                save_intermediates_to,
             }
         },
         scan_types_indeterminate() {
             return !(this.scan_types.length === 0 || this.scan_types.length === this.available_scan_types.length)
         }
+    },
+    watch: {
+        toggle(newState, oldState) {
+            $(`#selector_${this.pluginName}`).collapse(~~newState ? 'show' : 'hide')
+        },
     },
     methods: {
         handle_select_all(e) {
@@ -101,16 +88,28 @@ const zapApp = Vue.createApp({
             }
         },
         clear() {
+            this.zap_selectpicker[0]?.options.forEach(item =>
+                item.dataset.is_default && this.zap_selectpicker.val(item.value).selectpicker('refresh')
+            )
+            this.handleIntegrationSelect({target: this.zap_selectpicker})
+            this.toggle = false
+            $(`#settings_${this.pluginName}`).collapse('hide')
+
+        },
+        loadIntegration(stateData) {
             Object.assign(this.$data, {
                 ...this.$data,
-                ...zapInitialState(),
+                ...stateData,
             })
         },
-        load(stateData) {
+        loadSettings(stateData) {
             Object.assign(this.$data, {
                 ...this.$data,
-                ...stateData
+                ...stateData,
+                toggle: true
             })
+            this.zap_selectpicker.val(stateData.id)
+            this.zap_selectpicker.selectpicker && this.zap_selectpicker.selectpicker('refresh')
         },
         handleError(response) {
             try {
@@ -135,18 +134,15 @@ const zapApp = Vue.createApp({
                 this.scan_types.splice(i, 1)
             }
         },
-        handleIntegrationSelect(e) {
-            console.log('selected', e.target)
-            console.log('selected', e.target.value)
-            console.log('selected', $(e.target).prop('data-data'))
-            console.log('selected', $(e.target).attr('data-data'))
+        handleIntegrationSelect(e, doToggle = true) {
+            const target = $(e.target)
+            const {id, description, settings} = JSON.parse(
+                target.find(`option[value=${target.val()}]`)[0].dataset.data
+            )
+            this.loadIntegration({id, description, ...settings})
         }
     }
 })
 
 zapApp.config.compilerOptions.isCustomElement = tag => ['h9', 'h13', 'h7'].includes(tag)
 const zapVm = zapApp.mount('#security_scanner_zap')
-
-$(document).ready(() => {
-
-})

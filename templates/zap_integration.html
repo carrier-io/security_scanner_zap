@@ -74,8 +74,11 @@
                 <textarea class="form-control"
                           rows="7"
                           placeholder="Auth script"
-                          v-model="auth_script">
+                          v-model="auth_script"
+                          :class="{ 'is-invalid': error.auth_script }"
+                >
                 </textarea>
+                <div class="invalid-feedback">[[ error.auth_script ]]</div>
             </div>
         </div>
 
