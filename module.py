@@ -39,6 +39,7 @@ class Module(module.ModuleModel):
     def init(self):
         """ Init module """
         log.info("Initializing module ZAP")
+        return
 
         self.descriptor.init_blueprint()
         #
