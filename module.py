@@ -38,7 +38,7 @@ class Module(module.ModuleModel):
 
     def init(self):
         """ Init module """
-        log.info("Initializing module ZAP")
+        log.info("Initializing module")
         return
 
         self.descriptor.init_blueprint()
@@ -71,4 +71,4 @@ class Module(module.ModuleModel):
 
     def deinit(self):  # pylint: disable=R0201
         """ De-init module """
-        log.info("De-initializing module ZAP")
+        log.info("De-initializing module")

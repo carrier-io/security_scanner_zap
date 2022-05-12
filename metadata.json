@@ -1,6 +1,6 @@
 {
   "name": "Carrier Security Zap Plugin",
   "version": "0.1",
-  "depends_on": ["shared", "projects", "theme"],
+  "depends_on": ["integrations"],
   "init_after": ["theme"]
 }
