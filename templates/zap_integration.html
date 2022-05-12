@@ -2,14 +2,14 @@
 {% set display_name = 'Zap' %}
 {% set show_test_connection = False %}
 
-{{ template_slot('integrations_default_add_button', payload={
-    'integration_name': integration_name,
-    'display_name': display_name,
-    'logo': '<img src="%s"></img>' | format(url_for('%s.static' | format(integration_name), filename='logo.svg'))
-}) | safe }}
+<add-integration-button
+    integration_name="{{ integration_name }}"
+    display_name="{{ display_name }}"
+    logo="{{ '<img src="%s"></img>' | format(url_for('%s.static' | format(integration_name), filename='logo.svg')) }}"
+></add-integration-button>
 
 
-{% extends 'integrations:default_modal.html' %}
+{% extends 'integrations:configuration/modal_deprecated.html' %}
 {% block modal_body %}
     <div class="form-group">
         <div class="form-group">

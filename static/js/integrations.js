@@ -46,7 +46,7 @@ const Zap = {
 }
 
 
-const zapApp = Vue.createApp({
+const ZapIntegration = {
     delimiters: ['[[', ']]'],
     data() {
         return {
@@ -233,7 +233,8 @@ const zapApp = Vue.createApp({
             }
         }
     }
-})
+}
 
-zapApp.config.compilerOptions.isCustomElement = tag => ['h9', 'h13'].includes(tag)
-const zapVm = zapApp.mount(`#${Zap.pluginName}_integration`)
+// const zapVm = zapApp.mount(`#${Zap.pluginName}_integration`)
+
+vueApp.component('ZapIntegration', ZapIntegration)
