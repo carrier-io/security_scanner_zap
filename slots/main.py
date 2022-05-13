@@ -7,14 +7,14 @@ from flask import g
 #     form_data.integration_callback
 # )
 class Slot:
-    name = 'security_scanner_zap'
+    integration_name = 'security_scanner_zap'
     section_name = 'scanners'
 
     @web.slot(f'security_{section_name}')
     def toggle(self, context, slot, payload):
         integrations = context.rpc_manager.call.integrations_get_project_integrations_by_name(
             g.project.id,
-            'security_scanner_zap'
+            self.integration_name
         )
         # payload['project_integrations'] = integrations
         with context.app.app_context():
@@ -30,7 +30,7 @@ class Slot:
                 'zap_integration.html',
             )
 
-    @web.slot(f'integration_card_{name}')
+    @web.slot(f'integration_card_{integration_name}')
     def integration_card(self, context, slot, payload):
         with context.app.app_context():
             return self.descriptor.render_template(
