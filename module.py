@@ -38,7 +38,6 @@ class Module(module.ModuleModel):
 
     def init(self):
         """ Init module """
-        return
         log.info("Initializing module")
 
         SECTION_NAME = 'scanners'
