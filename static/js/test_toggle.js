@@ -1,29 +1,34 @@
 const ZapIntegration = {
     delimiters: ['[[', ']]'],
-    props: ['instance_name', 'project_integrations', 'integration_name'],
+    props: ['instance_name', 'section', 'selected_integration', 'is_selected', 'integration_data'],
+    // emits: ['set-data', 'clear-data'],
+    emits: ['set_data', 'clear_data'],
+    // data() {
+    //     return {
+    //         pluginName: 'security_scanner_zap',
+    //         ...zapInitialState()
+    //     }
+    // },
     data() {
-        return {
-            pluginName: 'security_scanner_zap',
-            ...zapInitialState()
-        }
+        return this.initialState()
     },
-    mounted() {
-        window[`scanners_${this.pluginName}`] = {
-            get_data: () => this.toggle && this.body_data,
-            // set_data: this.loadSettings,
-            clear_data: this.clear,
-        }
-        this.handleIntegrationSelect({target: this.zap_selectpicker})
-    },
+    // mounted() {
+    //     // window[`scanners_${this.pluginName}`] = {
+    //     //     get_data: () => this.toggle && this.body_data,
+    //     //     // set_data: this.loadSettings,
+    //     //     clear_data: this.clear,
+    //     // }
+    //     this.handleIntegrationSelect({target: this.zap_selectpicker})
+    // },
     computed: {
-        zap_selectpicker() {
-            return $(`#selector_${this.pluginName} .selectpicker`)
-        },
+        // zap_selectpicker() {
+        //     return $(`#selector_${this.pluginName} .selectpicker`)
+        // },
         body_data() {
             const {
                 description,
                 is_default,
-                id,
+                selected_integration: id,
 
                 scan_types,
                 auth_login,
@@ -56,43 +61,37 @@ const ZapIntegration = {
         }
     },
     watch: {
-        toggle(newState, oldState) {
-            $(`#selector_${this.pluginName}`).collapse(~~newState ? 'show' : 'hide')
-        },
+        selected_integration(newState, oldState) {
+            console.log('watching selected_integration: ', oldState, '->', newState)
+            console.log('watching selected_integration: ', this.integration_data)
+            this.set_data(this.integration_data.settings, false)
+        }
     },
     methods: {
-        handle_select_all(e) {
-            if (this.scan_types_indeterminate || !e.target.checked) {
-                this.scan_types = []
-                e.target.checked = false
-            } else {
-                this.scan_types = [...this.available_scan_types]
+        get_data() {
+            if (this.is_selected) {
+                return this.body_data
             }
         },
-        clear() {
-            this.zap_selectpicker[0]?.options.forEach(item =>
-                item.dataset.is_default && this.zap_selectpicker.val(item.value).selectpicker('refresh')
-            )
-            this.handleIntegrationSelect({target: this.zap_selectpicker})
-            this.toggle = false
-            $(`#settings_${this.pluginName}`).collapse('hide')
+        set_data(data, emit = true) {
+            Object.assign(this.$data, data)
+            console.log('zap emits set_data')
+            emit&& this.$emit('set_data')
+        },
+        clear_data() {
+            Object.assign(this.$data, this.initialState())
+            console.log('zap emits clear_data')
+            this.$emit('clear_data')
+
+            // this.zap_selectpicker[0]?.options.forEach(item =>
+            //     item.dataset.is_default && this.zap_selectpicker.val(item.value).selectpicker('refresh')
+            // )
+            // this.handleIntegrationSelect({target: this.zap_selectpicker})
+            // this.toggle = false
+            // $(`#settings_${this.pluginName}`).collapse('hide')
 
         },
-        loadIntegration(stateData) {
-            Object.assign(this.$data, {
-                ...this.$data,
-                ...stateData,
-            })
-        },
-        set_data(stateData) {
-            Object.assign(this.$data, {
-                ...this.$data,
-                ...stateData,
-                toggle: true
-            })
-            this.zap_selectpicker.val(stateData.id)
-            this.zap_selectpicker.selectpicker && this.zap_selectpicker.selectpicker('refresh')
-        },
+
         handleError(response) {
             try {
                 response.json().then(
@@ -108,6 +107,16 @@ const ZapIntegration = {
                 alertCreateTest.add(e, 'danger-overlay')
             }
         },
+
+
+        handle_select_all(e) {
+            if (this.scan_types_indeterminate || !e.target.checked) {
+                this.scan_types = []
+                e.target.checked = false
+            } else {
+                this.scan_types = [...this.available_scan_types]
+            }
+        },
         handleScanTypeCheck(value, checked) {
             if (checked) {
                 this.scan_types.push(value)
@@ -116,17 +125,26 @@ const ZapIntegration = {
                 this.scan_types.splice(i, 1)
             }
         },
-        handleIntegrationSelect(e, doToggle = true) {
-            const target = $(e.target)
-            const {id, description, settings} = JSON.parse(
-                target.find(`option[value=${target.val()}]`)[0].dataset.data
-            )
-            this.loadIntegration({id, description, ...settings})
-        },
-        initialState: () => ({
-            toggle: false,
 
-            id: null,
+        // loadIntegration(stateData) {
+        //     Object.assign(this.$data, {
+        //         ...this.$data,
+        //         ...stateData,
+        //     })
+        // },
+
+
+
+        // handleIntegrationSelect(e, doToggle = true) {
+        //     const target = $(e.target)
+        //     const {id, description, settings} = JSON.parse(
+        //         target.find(`option[value=${target.val()}]`)[0].dataset.data
+        //     )
+        //     this.loadIntegration({id, description, ...settings})
+        // },
+        initialState: () => ({
+            // toggle: false,
+
             error: {},
 
             available_scan_types: ['xss', 'sqli'],
@@ -143,28 +161,8 @@ const ZapIntegration = {
         })
     },
     template: `
-<div>
-    <div class="row">
-            <div class="collapse col-12 mb-3 pl-0" id="selector_{{ integration_name }}">
-                <select class="selectpicker" data-style="btn-secondary"
-                        @change="handleIntegrationSelect"
-                >
-                    {% for i in config['project_integrations'] %}
-                        <option
-                                value="{{ i.id }}"
-                                {% if i.is_default %} selected data-is_default="true"{% endif %}
-                                title="{{ i.description }} {% if i.is_default %} - default {% endif %}"
-                                data-data="{{ i.json() }}"
-                        >
-                            {{ i.description }} {% if i.is_default %} - default {% endif %}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
 
-        <div class="row">
-            <div class="collapse col-12 mb-3 p-0" id="settings_{{ integration_name }}">
+            <div class="mt-3">
                 <div class="row">
                     <div class="col">
                         <h7>Advanced Settings</h7>
@@ -302,12 +300,10 @@ const ZapIntegration = {
 
                 </div>
             </div>
-        </div>
-    </div>
+
     `
 }
 
-// zapApp.config.compilerOptions.isCustomElement = tag => ['h9', 'h13', 'h7'].includes(tag)
-// const zapVm = zapApp.mount('#security_scanner_zap')
 
 register_component('scanner-zap', ZapIntegration)
+
