@@ -76,7 +76,7 @@ const ZapIntegration = {
         set_data(data, emit = true) {
             Object.assign(this.$data, data)
             console.log('zap emits set_data')
-            emit&& this.$emit('set_data')
+            emit&& this.$emit('set_data', data)
         },
         clear_data() {
             Object.assign(this.$data, this.initialState())
