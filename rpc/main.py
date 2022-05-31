@@ -17,4 +17,4 @@ class RPC:
             "target": test_params["urls_to_scan"][0],
         }
         # log.info("Result: %s", result)
-        return result
+        return "zap", result
