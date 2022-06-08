@@ -330,7 +330,7 @@ const ZapIntegration = {
             })
         },
         handleEdit(data) {
-            console.log('editIntegration', data)
+            console.debug('ZAP editIntegration', data)
             const {description, is_default, id, settings} = data
             this.load({...settings, description, is_default, id})
             this.modal.modal('show')
@@ -359,9 +359,8 @@ const ZapIntegration = {
             try {
                 response.json().then(
                     errorData => {
-                        console.log(errorData)
                         errorData.forEach(item => {
-                            console.log('item error', item)
+                            console.debug('ZAP item error', item)
                             this.error = {[item.loc[0]]: item.msg}
                         })
                     }
