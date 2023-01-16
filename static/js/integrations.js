@@ -14,7 +14,8 @@
 
 const ZapIntegration = {
     delimiters: ['[[', ']]'],
-    props: ['instance_name', 'display_name', 'default_template'],
+    props: ['instance_name', 'display_name', 'default_template', 'logo_src', 'section_name'],
+    emits: ['update'],
     template: `
 <div
     :id="modal_id"
@@ -246,6 +247,7 @@ const ZapIntegration = {
                 external_zap_daemon,
                 external_zap_api_key,
                 save_intermediates_to,
+                status
             } = this
             return {
                 description,
@@ -265,6 +267,7 @@ const ZapIntegration = {
                 external_zap_daemon,
                 external_zap_api_key,
                 save_intermediates_to,
+                status
             }
         },
         // test_connection_class() {
@@ -349,7 +352,7 @@ const ZapIntegration = {
                 this.is_fetching = false
                 if (response.ok) {
                     this.modal.modal('hide')
-                    location.reload()
+                     this.$emit('update', {...this.$data, section_name: this.section_name})
                 } else {
                     this.handleError(response)
                 }
@@ -379,7 +382,7 @@ const ZapIntegration = {
                 this.is_fetching = false
                 if (response.ok) {
                     this.modal.modal('hide')
-                    location.reload()
+                     this.$emit('update', {...this.$data, section_name: this.section_name})
                 } else {
                     this.handleError(response)
                 }
@@ -392,7 +395,7 @@ const ZapIntegration = {
             }).then(response => {
                 this.is_fetching = false
                 if (response.ok) {
-                    location.reload()
+                     this.$emit('update', {...this.$data, section_name: this.section_name})
                 } else {
                     this.handleError(response)
                     alertMain.add(`Deletion error. <button class="btn btn-primary" @click="modal.modal('show')">Open modal<button>`)
@@ -440,6 +443,8 @@ const ZapIntegration = {
 
             pluginName: 'security_scanner_zap',
             api_base: '/api/v1/integrations/',
+
+            status: integration_status.success,
         }),
     }
 }
