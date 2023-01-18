@@ -1,19 +1,8 @@
-// const Zap = {
-//     edit: data => {
-//
-//     },
-//     delete: id => {
-//         zapVm.load({id})
-//         zapVm.delete()
-//     },
-//     defaultTemplate: '',
-//
-//     pluginName: 'security_scanner_zap'
-// }
-
-
 const ZapIntegration = {
     delimiters: ['[[', ']]'],
+    components: {
+        SecretFieldInput: SecretFieldInput
+    },
     props: ['instance_name', 'display_name', 'default_template', 'logo_src', 'section_name'],
     emits: ['update'],
     template: `
@@ -35,25 +24,26 @@ const ZapIntegration = {
             <div class="form-group">
                 <div class="form-group">
                     <h9>Scan Types</h9>
-                    <div class="form-check"
+                    <div class="d-flex"
                          :class="{ 'is-invalid': error.scan_types }"
                     >
-                        <label class="mr-5">
-                            <input class="form-check-input" type="checkbox"
+                        <label class="custom-checkbox d-flex align-items-center mr-3">
+                            <input type="checkbox"
                                    :indeterminate="scan_types_indeterminate"
                                    @change="handle_select_all"
                                    :checked="scan_types.length === available_scan_types.length"
                             >
-                            <h9>
+                            <h9 class="ml-1">
                                 all
                             </h9>
                         </label>
-                        <label class="mr-5" v-for="st in available_scan_types" :key="st">
-                            <input class="form-check-input" type="checkbox"
+                        <label class="custom-checkbox d-flex align-items-center mr-3" 
+                            v-for="st in available_scan_types" :key="st">
+                            <input type="checkbox"
                                    @change="e => handleScanTypeCheck(st, e.target.checked)"
                                    :checked="scan_types.includes(st)"
                             >
-                            <h9>
+                            <h9 class="ml-1">
                                 [[ st ]]
                             </h9>
                         </label>
@@ -79,11 +69,11 @@ const ZapIntegration = {
                         <p>
                             <h13>Optional</h13>
                         </p>
-                        <input type="password" class="form-control form-control-alternative"
-                               placeholder="Password"
-                               v-model="auth_password"
-                               :class="{ 'is-invalid': error.password }">
-                        <div class="invalid-feedback">[[ error.password ]]</div>
+                        <SecretFieldInput
+                            v-model="auth_password"
+                            placeholder="Password"
+                        />
+                        <div v-show="error.password" class="invalid-feedback" style="display: block">[[ error.password ]]</div>
                     </div>
                     <div class="col-12">
                         <h9>Auth script</h9>
@@ -102,72 +92,43 @@ const ZapIntegration = {
                 </div>
                 
                 
-<!--                 <div class="form-check">-->
-<!--                    <label>-->
-<!--                        <input class="form-check-input" type="checkbox"-->
-<!--                               v-model="bind_all_interfaces">-->
-<!--                        <h9>-->
-<!--                            Bind all interfaces-->
-<!--                        </h9>-->
-<!--                    </label>-->
-<!--                </div>-->
-<!--                <div class="form-check">-->
-<!--                    <label>-->
-<!--                        <input class="form-check-input" type="checkbox"-->
-<!--                               v-model="daemon_debug">-->
-<!--                        <h9>-->
-<!--                            Daemon debug-->
-<!--                        </h9>-->
-<!--                    </label>-->
-<!--                </div>-->
-<h9>Java options</h9>
-        <p>
-            <h13>Optional</h13>
-        </p>
-        <input type="text" class="form-control form-control-alternative"
-               placeholder="Java options"
-               v-model="java_options"
-               :class="{ 'is-invalid': error.java_options }">
-        <div class="invalid-feedback">[[ error.java_options ]]</div>
+                <h9>Java options</h9>
+                <p>
+                    <h13>Optional</h13>
+                </p>
+                <input type="text" class="form-control form-control-alternative"
+                       placeholder="Java options"
+                       v-model="java_options"
+                       :class="{ 'is-invalid': error.java_options }">
+                <div class="invalid-feedback">[[ error.java_options ]]</div>
         
-<!--                <div class="form-check">-->
-<!--                    <label>-->
-<!--                        <input class="form-check-input" type="checkbox"-->
-<!--                               v-model="split_by_endpoint">-->
-<!--                        <h9>-->
-<!--                            Split by endpoint-->
-<!--                        </h9>-->
-<!--                    </label>-->
-<!--                </div>-->
-<div class="form-group form-row">
-            <div class="col-6">
-
-
-                <h9>Passive scan wait threshold</h9>
-                <p>
-                    <h13>Optional</h13>
-                </p>
-                <input type="number" class="form-control form-control-alternative"
-                       placeholder=""
-                       v-model="passive_scan_wait_threshold"
-                       :class="{ 'is-invalid': error.passive_scan_wait_threshold }"
-                >
-                <div class="invalid-feedback">[[ error.passive_scan_wait_threshold ]]</div>
-            </div>
-            <div class="col-6">
-                <h9>Passive scan wait limit</h9>
-                <p>
-                    <h13>Optional</h13>
-                </p>
-                <input type="number" class="form-control form-control-alternative"
-                       placeholder=""
-                       v-model="passive_scan_wait_limit"
-                       :class="{ 'is-invalid': error.passive_scan_wait_limit }"
-                >
-                <div class="invalid-feedback">[[ error.passive_scan_wait_limit ]]</div>
-            </div>
-        </div>
-              <h9>External zap daemon</h9>
+                <div class="form-group form-row">
+                    <div class="col-6">
+                        <h9>Passive scan wait threshold</h9>
+                        <p>
+                            <h13>Optional</h13>
+                        </p>
+                        <input type="number" class="form-control form-control-alternative"
+                               placeholder=""
+                               v-model="passive_scan_wait_threshold"
+                               :class="{ 'is-invalid': error.passive_scan_wait_threshold }"
+                        >
+                        <div class="invalid-feedback">[[ error.passive_scan_wait_threshold ]]</div>
+                    </div>
+                    <div class="col-6">
+                        <h9>Passive scan wait limit</h9>
+                        <p>
+                            <h13>Optional</h13>
+                        </p>
+                        <input type="number" class="form-control form-control-alternative"
+                               placeholder=""
+                               v-model="passive_scan_wait_limit"
+                               :class="{ 'is-invalid': error.passive_scan_wait_limit }"
+                        >
+                        <div class="invalid-feedback">[[ error.passive_scan_wait_limit ]]</div>
+                    </div>
+                </div>
+                <h9>External zap daemon</h9>
                 <p>
                     <h13>Optional</h13>
                 </p>
@@ -176,7 +137,7 @@ const ZapIntegration = {
                        v-model="external_zap_daemon"
                        :class="{ 'is-invalid': error.external_zap_daemon }">
                 <div class="invalid-feedback">[[ error.external_zap_daemon ]]</div>
-
+                
                 <h9>External zap api key</h9>
                 <p>
                     <h13>Optional</h13>
@@ -186,7 +147,7 @@ const ZapIntegration = {
                        v-model="external_zap_api_key"
                        :class="{ 'is-invalid': error.external_zap_api_key }">
                 <div class="invalid-feedback">[[ error.external_zap_api_key ]]</div>
-
+                
                 <h9>Save intermediates to</h9>
                 <p>
                     <h13>Optional</h13>
@@ -196,8 +157,7 @@ const ZapIntegration = {
                        v-model="save_intermediates_to"
                        :class="{ 'is-invalid': error.save_intermediates_to }">
                 <div class="invalid-feedback">[[ error.save_intermediates_to ]]</div>
-</div>
-
+            </div>
         </template>
         <template #footer>
             <test-connection-button
@@ -209,7 +169,6 @@ const ZapIntegration = {
             >
             </test-connection-button>
         </template>
-
     </ModalDialog>
 </div>
     `,
@@ -233,7 +192,6 @@ const ZapIntegration = {
                 description,
                 is_default,
                 project_id,
-
                 scan_types,
                 auth_login,
                 auth_password,
@@ -270,15 +228,6 @@ const ZapIntegration = {
                 status
             }
         },
-        // test_connection_class() {
-        //     if (200 <= this.test_connection_status && this.test_connection_status < 300) {
-        //         return 'btn-success'
-        //     } else if (this.test_connection_status > 0) {
-        //         return 'btn-warning'
-        //     } else {
-        //         return 'btn-secondary'
-        //     }
-        // },
         scan_types_indeterminate() {
             return !(this.scan_types.length === 0 || this.scan_types.length === this.available_scan_types.length)
         },
@@ -289,13 +238,6 @@ const ZapIntegration = {
             return `${this.instance_name}_integration`
         }
     },
-    // watch: {
-    //     is_fetching(newState, oldState) {
-    //         if (newState) {
-    //             this.test_connection_status = 0
-    //         }
-    //     },
-    // },
     methods: {
         handle_select_all(e) {
             if (this.scan_types_indeterminate || !e.target.checked) {
@@ -305,21 +247,6 @@ const ZapIntegration = {
                 this.scan_types = [...this.available_scan_types]
             }
         },
-        // test_connection() {
-        //     this.is_fetching = true
-        //     fetch(this.apiPath + 'check_settings', {
-        //         method: 'POST',
-        //         headers: {'Content-Type': 'application/json'},
-        //         body: JSON.stringify(this.body_data)
-        //     }).then(response => {
-        //         console.log(response)
-        //         this.is_fetching = false
-        //         this.test_connection_status = response.status
-        //         if (!response.ok) {
-        //             this.handleError(response)
-        //         }
-        //     })
-        // },
         clear() {
             Object.assign(this.$data, {
                 ...this.$data,
@@ -422,7 +349,10 @@ const ZapIntegration = {
             scan_types: ['xss', 'sqli'],
 
             auth_login: 'user',
-            auth_password: 'P@ssw0rd',
+            auth_password: {
+                value: '',
+                from_secrets: false
+            },
             auth_script: "- {command: open, target: '%Target%/login', value: ''}\n" +
                 "- {command: waitForElementPresent, target: id=login_login, value: ''}\n" +
                 "- {command: waitForElementPresent, target: id=login_password, value: ''}\n" +
@@ -449,7 +379,4 @@ const ZapIntegration = {
     }
 }
 
-// const zapVm = zapApp.mount(`#${Zap.pluginName}_integration`)
-
-// vueApp.component('ZapIntegration', ZapIntegration)
 register_component('ZapIntegration', ZapIntegration)
