@@ -35,7 +35,7 @@ class IntegrationModel(BaseModel):
     external_zap_api_key: Optional[str] = 'dusty'
     save_intermediates_to: Optional[str] = '/data/intermediates/dast'
 
-    def check_connection(self) -> bool:
+    def check_connection(self, **kwargs) -> bool:
         try:
             return True
         except Exception as e:
