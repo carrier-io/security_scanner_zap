@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Union
 
 import yaml
 from pydantic import BaseModel, AnyUrl
@@ -6,12 +6,14 @@ from pydantic.class_validators import validator
 from pydantic.fields import ModelField
 from pylon.core.tools import log
 
+from ...integrations.models.pd.integration import SecretField
+
 
 class IntegrationModel(BaseModel):
 
     scan_types: List[str] = ['xss', 'sqli']
     auth_login: Optional[str] = 'user'
-    auth_password: Optional[str] = 'P@ssw0rd'
+    auth_password: Union[SecretField, str, None] = ''
     auth_script: Optional[str] = """
         - {command: open, target: '%Target%/login', value: ''}
         - {command: waitForElementPresent, target: id=login_login, value: ''}
@@ -33,7 +35,7 @@ class IntegrationModel(BaseModel):
     external_zap_api_key: Optional[str] = 'dusty'
     save_intermediates_to: Optional[str] = '/data/intermediates/dast'
 
-    def check_connection(self) -> bool:
+    def check_connection(self, **kwargs) -> bool:
         try:
             return True
         except Exception as e:

@@ -1,59 +1,179 @@
-const Zap = {
-    edit: data => {
-        console.log('editIntegration', data)
-        const {description, is_default, id, settings} = data
-        zapVm.load({...settings, description, is_default, id})
-        zapVm.modal.modal('show')
-    },
-    delete: id => {
-        zapVm.load({id})
-        zapVm.delete()
-    },
-    defaultTemplate: '',
-    initialState: () => ({
-        description: '',
-        is_default: false,
-        is_fetching: false,
-        error: {},
-        test_connection_status: 0,
-        id: null,
-
-        available_scan_types: ['xss', 'sqli'],
-        scan_types: ['xss', 'sqli'],
-
-        auth_login: 'user',
-        auth_password: 'P@ssw0rd',
-        auth_script: "- {command: open, target: '%Target%/login', value: ''}\n" +
-            "- {command: waitForElementPresent, target: id=login_login, value: ''}\n" +
-            "- {command: waitForElementPresent, target: id=login_password, value: ''}\n" +
-            "- {command: waitForElementPresent, target: id=login_0, value: ''}\n" +
-            "- {command: type, target: id=login_login, value: '%Username%'}\n" +
-            "- {command: type, target: id=login_password, value: '%Password%'}\n" +
-            "- {command: clickAndWait, target: id=login_0, value: ''}",
-        // bind_all_interfaces: true,
-        // daemon_debug: false,
-        java_options: '-Xmx1g',
-        // split_by_endpoint: false,
-        passive_scan_wait_threshold: 0,
-        passive_scan_wait_limit: 600,
-        // external_zap_daemon: 'http://192.168.0.2:8091',
-        // external_zap_api_key: 'dusty',
-        // save_intermediates_to: '/data/intermediates/dast'
-
-
-    }),
-    pluginName: 'security_scanner_zap'
-}
-
-
-const zapApp = Vue.createApp({
+const ZapIntegration = {
     delimiters: ['[[', ']]'],
+    components: {
+        SecretFieldInput: SecretFieldInput
+    },
+    props: ['instance_name', 'display_name', 'default_template', 'logo_src', 'section_name'],
+    emits: ['update'],
+    template: `
+<div
+    :id="modal_id"
+    class="modal modal-small fixed-left fade shadow-sm" tabindex="-1" role="dialog"
+>
+    <ModalDialog
+            v-model:description="description"
+            v-model:is_default="is_default"
+            @update="update"
+            @create="create"
+            :display_name="display_name"
+            :id="id"
+            :is_fetching="is_fetching"
+            :is_default="is_default"
+    >
+        <template #body>
+            <div class="form-group">
+                <div class="form-group">
+                    <h9>Scan Types</h9>
+                    <div class="d-flex"
+                         :class="{ 'is-invalid': error.scan_types }"
+                    >
+                        <label class="custom-checkbox d-flex align-items-center mr-3">
+                            <input type="checkbox"
+                                   :indeterminate="scan_types_indeterminate"
+                                   @change="handle_select_all"
+                                   :checked="scan_types.length === available_scan_types.length"
+                            >
+                            <h9 class="ml-1">
+                                all
+                            </h9>
+                        </label>
+                        <label class="custom-checkbox d-flex align-items-center mr-3" 
+                            v-for="st in available_scan_types" :key="st">
+                            <input type="checkbox"
+                                   @change="e => handleScanTypeCheck(st, e.target.checked)"
+                                   :checked="scan_types.includes(st)"
+                            >
+                            <h9 class="ml-1">
+                                [[ st ]]
+                            </h9>
+                        </label>
+                    </div>
+                    <div class="invalid-feedback">[[ error.scan_types ]]</div>
+                </div>
+        
+                <div class="form-group form-row">
+                    <div class="col-6">
+                        <h9>Login</h9>
+                        <p>
+                            <h13>Optional</h13>
+                        </p>
+                        <input type="text" class="form-control form-control-alternative"
+                               placeholder="User"
+                               v-model="auth_login"
+                               :class="{ 'is-invalid': error.auth_login }">
+                        <div class="invalid-feedback">[[ error.auth_login ]]</div>
+                    </div>
+                    <div class="col-6">
+        
+                        <h9>Password</h9>
+                        <p>
+                            <h13>Optional</h13>
+                        </p>
+                        <SecretFieldInput
+                            v-model="auth_password"
+                            placeholder="Password"
+                        />
+                        <div v-show="error.password" class="invalid-feedback" style="display: block">[[ error.password ]]</div>
+                    </div>
+                    <div class="col-12">
+                        <h9>Auth script</h9>
+                        <p>
+                            <h13>Optional</h13>
+                        </p>
+                        <textarea class="form-control"
+                                  rows="7"
+                                  placeholder="Auth script"
+                                  v-model="auth_script"
+                                  :class="{ 'is-invalid': error.auth_script }"
+                        >
+                        </textarea>
+                        <div class="invalid-feedback">[[ error.auth_script ]]</div>
+                    </div>
+                </div>
+                
+                
+                <h9>Java options</h9>
+                <p>
+                    <h13>Optional</h13>
+                </p>
+                <input type="text" class="form-control form-control-alternative"
+                       placeholder="Java options"
+                       v-model="java_options"
+                       :class="{ 'is-invalid': error.java_options }">
+                <div class="invalid-feedback">[[ error.java_options ]]</div>
+        
+                <div class="form-group form-row">
+                    <div class="col-6">
+                        <h9>Passive scan wait threshold</h9>
+                        <p>
+                            <h13>Optional</h13>
+                        </p>
+                        <input type="number" class="form-control form-control-alternative"
+                               placeholder=""
+                               v-model="passive_scan_wait_threshold"
+                               :class="{ 'is-invalid': error.passive_scan_wait_threshold }"
+                        >
+                        <div class="invalid-feedback">[[ error.passive_scan_wait_threshold ]]</div>
+                    </div>
+                    <div class="col-6">
+                        <h9>Passive scan wait limit</h9>
+                        <p>
+                            <h13>Optional</h13>
+                        </p>
+                        <input type="number" class="form-control form-control-alternative"
+                               placeholder=""
+                               v-model="passive_scan_wait_limit"
+                               :class="{ 'is-invalid': error.passive_scan_wait_limit }"
+                        >
+                        <div class="invalid-feedback">[[ error.passive_scan_wait_limit ]]</div>
+                    </div>
+                </div>
+                <h9>External zap daemon</h9>
+                <p>
+                    <h13>Optional</h13>
+                </p>
+                <input type="text" class="form-control form-control-alternative"
+                       placeholder="Url"
+                       v-model="external_zap_daemon"
+                       :class="{ 'is-invalid': error.external_zap_daemon }">
+                <div class="invalid-feedback">[[ error.external_zap_daemon ]]</div>
+                
+                <h9>External zap api key</h9>
+                <p>
+                    <h13>Optional</h13>
+                </p>
+                <input type="text" class="form-control form-control-alternative"
+                       placeholder=""
+                       v-model="external_zap_api_key"
+                       :class="{ 'is-invalid': error.external_zap_api_key }">
+                <div class="invalid-feedback">[[ error.external_zap_api_key ]]</div>
+                
+                <h9>Save intermediates to</h9>
+                <p>
+                    <h13>Optional</h13>
+                </p>
+                <input type="text" class="form-control form-control-alternative"
+                       placeholder=""
+                       v-model="save_intermediates_to"
+                       :class="{ 'is-invalid': error.save_intermediates_to }">
+                <div class="invalid-feedback">[[ error.save_intermediates_to ]]</div>
+            </div>
+        </template>
+        <template #footer>
+            <test-connection-button
+                    :apiPath="api_base + 'check_settings'"
+                    :error="error.check_connection"
+                    :body_data="body_data"
+                    v-model:is_fetching="is_fetching"
+                    @handleError="handleError"
+            >
+            </test-connection-button>
+        </template>
+    </ModalDialog>
+</div>
+    `,
     data() {
-        return {
-            pluginName: Zap.pluginName,
-            modal: $(`#${Zap.pluginName}_integration`),
-            ...Zap.initialState()
-        }
+        return this.initialState()
     },
     mounted() {
         this.modal.on('hidden.bs.modal', e => {
@@ -62,7 +182,7 @@ const zapApp = Vue.createApp({
     },
     computed: {
         apiPath() {
-            return `/api/v1/integrations/${this.pluginName}/`
+            return this.api_base + 'integration/'
         },
         project_id() {
             return getSelectedProjectId()
@@ -72,7 +192,6 @@ const zapApp = Vue.createApp({
                 description,
                 is_default,
                 project_id,
-
                 scan_types,
                 auth_login,
                 auth_password,
@@ -86,6 +205,7 @@ const zapApp = Vue.createApp({
                 external_zap_daemon,
                 external_zap_api_key,
                 save_intermediates_to,
+                status
             } = this
             return {
                 description,
@@ -105,27 +225,18 @@ const zapApp = Vue.createApp({
                 external_zap_daemon,
                 external_zap_api_key,
                 save_intermediates_to,
-            }
-        },
-        test_connection_class() {
-            if (200 <= this.test_connection_status && this.test_connection_status < 300) {
-                return 'btn-success'
-            } else if (this.test_connection_status > 0) {
-                return 'btn-warning'
-            } else {
-                return 'btn-secondary'
+                status
             }
         },
         scan_types_indeterminate() {
             return !(this.scan_types.length === 0 || this.scan_types.length === this.available_scan_types.length)
-        }
-    },
-    watch: {
-        is_fetching(newState, oldState) {
-            if (newState) {
-                this.test_connection_status = 0
-            }
         },
+        modal() {
+            return $(this.$el)
+        },
+        modal_id() {
+            return `${this.instance_name}_integration`
+        }
     },
     methods: {
         handle_select_all(e) {
@@ -136,25 +247,10 @@ const zapApp = Vue.createApp({
                 this.scan_types = [...this.available_scan_types]
             }
         },
-        // test_connection() {
-        //     this.is_fetching = true
-        //     fetch(this.apiPath + 'check_settings', {
-        //         method: 'POST',
-        //         headers: {'Content-Type': 'application/json'},
-        //         body: JSON.stringify(this.body_data)
-        //     }).then(response => {
-        //         console.log(response)
-        //         this.is_fetching = false
-        //         this.test_connection_status = response.status
-        //         if (!response.ok) {
-        //             this.handleError(response)
-        //         }
-        //     })
-        // },
         clear() {
             Object.assign(this.$data, {
                 ...this.$data,
-                ...Zap.initialState(),
+                ...this.initialState(),
             })
         },
         load(stateData) {
@@ -163,9 +259,19 @@ const zapApp = Vue.createApp({
                 ...stateData
             })
         },
+        handleEdit(data) {
+            console.debug('ZAP editIntegration', data)
+            const {description, is_default, id, settings} = data
+            this.load({...settings, description, is_default, id})
+            this.modal.modal('show')
+        },
+        handleDelete(id) {
+            this.load({id})
+            this.delete()
+        },
         create() {
             this.is_fetching = true
-            fetch(this.apiPath, {
+            fetch(this.apiPath + this.pluginName, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(this.body_data)
@@ -173,7 +279,7 @@ const zapApp = Vue.createApp({
                 this.is_fetching = false
                 if (response.ok) {
                     this.modal.modal('hide')
-                    location.reload()
+                     this.$emit('update', {...this.$data, section_name: this.section_name})
                 } else {
                     this.handleError(response)
                 }
@@ -183,9 +289,8 @@ const zapApp = Vue.createApp({
             try {
                 response.json().then(
                     errorData => {
-                        console.log(errorData)
                         errorData.forEach(item => {
-                            console.log('item error', item)
+                            console.debug('ZAP item error', item)
                             this.error = {[item.loc[0]]: item.msg}
                         })
                     }
@@ -204,7 +309,7 @@ const zapApp = Vue.createApp({
                 this.is_fetching = false
                 if (response.ok) {
                     this.modal.modal('hide')
-                    location.reload()
+                     this.$emit('update', {...this.$data, section_name: this.section_name})
                 } else {
                     this.handleError(response)
                 }
@@ -217,7 +322,7 @@ const zapApp = Vue.createApp({
             }).then(response => {
                 this.is_fetching = false
                 if (response.ok) {
-                    location.reload()
+                     this.$emit('update', {...this.$data, section_name: this.section_name})
                 } else {
                     this.handleError(response)
                     alertMain.add(`Deletion error. <button class="btn btn-primary" @click="modal.modal('show')">Open modal<button>`)
@@ -231,9 +336,47 @@ const zapApp = Vue.createApp({
                 const i = this.scan_types.indexOf(value)
                 this.scan_types.splice(i, 1)
             }
-        }
-    }
-})
+        },
+        initialState: () => ({
+            description: '',
+            is_default: false,
+            is_fetching: false,
+            error: {},
+            test_connection_status: 0,
+            id: null,
 
-zapApp.config.compilerOptions.isCustomElement = tag => ['h9', 'h13'].includes(tag)
-const zapVm = zapApp.mount(`#${Zap.pluginName}_integration`)
+            available_scan_types: ['xss', 'sqli'],
+            scan_types: ['xss', 'sqli'],
+
+            auth_login: 'user',
+            auth_password: {
+                value: '',
+                from_secrets: false
+            },
+            auth_script: "- {command: open, target: '%Target%/login', value: ''}\n" +
+                "- {command: waitForElementPresent, target: id=login_login, value: ''}\n" +
+                "- {command: waitForElementPresent, target: id=login_password, value: ''}\n" +
+                "- {command: waitForElementPresent, target: id=login_0, value: ''}\n" +
+                "- {command: type, target: id=login_login, value: '%Username%'}\n" +
+                "- {command: type, target: id=login_password, value: '%Password%'}\n" +
+                "- {command: clickAndWait, target: id=login_0, value: ''}",
+            bind_all_interfaces: true,
+            daemon_debug: false,
+            java_options: '-Xmx1g',
+            split_by_endpoint: false,
+            passive_scan_wait_threshold: 0,
+            passive_scan_wait_limit: 600,
+
+            external_zap_daemon: 'http://192.168.0.2:8091',
+            external_zap_api_key: 'dusty',
+            save_intermediates_to: '/data/intermediates/dast',
+
+            pluginName: 'security_scanner_zap',
+            api_base: '/api/v1/integrations/',
+
+            status: integration_status.success,
+        }),
+    }
+}
+
+register_component('ZapIntegration', ZapIntegration)
