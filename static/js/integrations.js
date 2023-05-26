@@ -21,93 +21,68 @@ const ZapIntegration = {
             :is_default="is_default"
     >
         <template #body>
-            <div class="form-group">
-                <div class="form-group">
-                    <h9>Scan Types</h9>
+            <div>
+                <div>
+                    <p class="font-h5 font-semibold mb-2">Scan Types</p>
                     <div class="d-flex"
                          :class="{ 'is-invalid': error.scan_types }"
                     >
                         <label class="custom-checkbox d-flex align-items-center mr-3">
-                            <input type="checkbox"
+                            <input class="mr-2.5" type="checkbox"
                                    :indeterminate="scan_types_indeterminate"
                                    @change="handle_select_all"
                                    :checked="scan_types.length === available_scan_types.length"
                             >
-                            <h9 class="ml-1">
-                                all
-                            </h9>
+                            <p class="font-h5">all</p>
                         </label>
                         <label class="custom-checkbox d-flex align-items-center mr-3" 
                             v-for="st in available_scan_types" :key="st">
-                            <input type="checkbox"
+                            <input type="checkbox" class="mr-2.5"
                                    @change="e => handleScanTypeCheck(st, e.target.checked)"
                                    :checked="scan_types.includes(st)"
                             >
-                            <h9 class="ml-1">
-                                [[ st ]]
-                            </h9>
+                            <p class="font-h5">[[ st ]]</p>
                         </label>
                     </div>
                     <div class="invalid-feedback">[[ error.scan_types ]]</div>
                 </div>
-        
-                <div class="form-group form-row">
-                    <div class="col-6">
-                        <h9>Login</h9>
-                        <p>
-                            <h13>Optional</h13>
-                        </p>
-                        <input type="text" class="form-control form-control-alternative"
-                               placeholder="User"
-                               v-model="auth_login"
-                               :class="{ 'is-invalid': error.auth_login }">
-                        <div class="invalid-feedback">[[ error.auth_login ]]</div>
-                    </div>
-                    <div class="col-6">
-        
-                        <h9>Password</h9>
-                        <p>
-                            <h13>Optional</h13>
-                        </p>
-                        <SecretFieldInput
-                            v-model="auth_password"
-                            placeholder="Password"
-                        />
-                        <div v-show="error.password" class="invalid-feedback" style="display: block">[[ error.password ]]</div>
-                    </div>
-                    <div class="col-12">
-                        <h9>Auth script</h9>
-                        <p>
-                            <h13>Optional</h13>
-                        </p>
-                        <textarea class="form-control"
-                                  rows="7"
-                                  placeholder="Auth script"
-                                  v-model="auth_script"
-                                  :class="{ 'is-invalid': error.auth_script }"
-                        >
-                        </textarea>
-                        <div class="invalid-feedback">[[ error.auth_script ]]</div>
-                    </div>
+                <div class="mt-3">
+                    <p class="font-h5 font-semibold mb-1">Login<span class="text-gray-600 font-h6 font-weight-400 ml-1">(optional)</span></p>
+                    <input type="text" class="form-control form-control-alternative"
+                           placeholder="User"
+                           v-model="auth_login"
+                           :class="{ 'is-invalid': error.auth_login }">
+                    <div class="invalid-feedback">[[ error.auth_login ]]</div>
+                </div>
+                <div class="mt-3">
+                    <p class="font-h5 font-semibold mb-1">Password<span class="text-gray-600 font-h6 font-weight-400 ml-1">(optional)</span></p>
+                    <SecretFieldInput v-model="auth_password" placeholder="Password"/>
+                    <div v-show="error.password" class="invalid-feedback" style="display: block">[[ error.password ]]</div>
+                </div>
+                <div class="mt-3">
+                    <p class="font-h5 font-semibold mb-1">Auth script<span class="text-gray-600 font-h6 font-weight-400 ml-1">(optional)</span></p>
+                    <textarea class="form-control"
+                              rows="7"
+                              placeholder="Auth script"
+                              v-model="auth_script"
+                              :class="{ 'is-invalid': error.auth_script }"
+                    >
+                    </textarea>
+                    <div class="invalid-feedback">[[ error.auth_script ]]</div>
                 </div>
                 
-                
-                <h9>Java options</h9>
-                <p>
-                    <h13>Optional</h13>
-                </p>
-                <input type="text" class="form-control form-control-alternative"
-                       placeholder="Java options"
-                       v-model="java_options"
-                       :class="{ 'is-invalid': error.java_options }">
-                <div class="invalid-feedback">[[ error.java_options ]]</div>
+                <div class="mt-3">
+                    <p class="font-h5 font-semibold mb-1">Java options<span class="text-gray-600 font-h6 font-weight-400 ml-1">(optional)</span></p>
+                    <input type="text" class="form-control form-control-alternative"
+                           placeholder="Java options"
+                           v-model="java_options"
+                           :class="{ 'is-invalid': error.java_options }">
+                    <div class="invalid-feedback">[[ error.java_options ]]</div>
+                </div>
         
-                <div class="form-group form-row">
-                    <div class="col-6">
-                        <h9>Passive scan wait threshold</h9>
-                        <p>
-                            <h13>Optional</h13>
-                        </p>
+                <div class="mt-3 d-flex gap-4">
+                    <div class="w-50">
+                        <p class="font-h5 font-semibold mb-1">Passive scan wait threshold<span class="text-gray-600 font-h6 font-weight-400 ml-1">(optional)</span></p>
                         <input type="number" class="form-control form-control-alternative"
                                placeholder=""
                                v-model="passive_scan_wait_threshold"
@@ -115,11 +90,8 @@ const ZapIntegration = {
                         >
                         <div class="invalid-feedback">[[ error.passive_scan_wait_threshold ]]</div>
                     </div>
-                    <div class="col-6">
-                        <h9>Passive scan wait limit</h9>
-                        <p>
-                            <h13>Optional</h13>
-                        </p>
+                    <div class="w-50 d-flex flex-column justify-content-end">
+                        <p class="font-h5 font-semibold mb-1">Passive scan wait limit<span class="text-gray-600 font-h6 font-weight-400 ml-1">(optional)</span></p>
                         <input type="number" class="form-control form-control-alternative"
                                placeholder=""
                                v-model="passive_scan_wait_limit"
@@ -128,35 +100,31 @@ const ZapIntegration = {
                         <div class="invalid-feedback">[[ error.passive_scan_wait_limit ]]</div>
                     </div>
                 </div>
-                <h9>External zap daemon</h9>
-                <p>
-                    <h13>Optional</h13>
-                </p>
-                <input type="text" class="form-control form-control-alternative"
-                       placeholder="Url"
-                       v-model="external_zap_daemon"
-                       :class="{ 'is-invalid': error.external_zap_daemon }">
-                <div class="invalid-feedback">[[ error.external_zap_daemon ]]</div>
+                <div class="mt-3">
+                    <p class="font-h5 font-semibold mb-1">External zap daemon<span class="text-gray-600 font-h6 font-weight-400 ml-1">(optional)</span></p>
+                    <input type="text" class="form-control form-control-alternative"
+                           placeholder="Url"
+                           v-model="external_zap_daemon"
+                           :class="{ 'is-invalid': error.external_zap_daemon }">
+                    <div class="invalid-feedback">[[ error.external_zap_daemon ]]</div>
+                </div>
+                <div class="mt-3">
+                    <p class="font-h5 font-semibold mb-1">External zap api key<span class="text-gray-600 font-h6 font-weight-400 ml-1">(optional)</span></p>
+                    <input type="text" class="form-control form-control-alternative"
+                           placeholder=""
+                           v-model="external_zap_api_key"
+                           :class="{ 'is-invalid': error.external_zap_api_key }">
+                    <div class="invalid-feedback">[[ error.external_zap_api_key ]]</div>
+                </div>
                 
-                <h9>External zap api key</h9>
-                <p>
-                    <h13>Optional</h13>
-                </p>
-                <input type="text" class="form-control form-control-alternative"
-                       placeholder=""
-                       v-model="external_zap_api_key"
-                       :class="{ 'is-invalid': error.external_zap_api_key }">
-                <div class="invalid-feedback">[[ error.external_zap_api_key ]]</div>
-                
-                <h9>Save intermediates to</h9>
-                <p>
-                    <h13>Optional</h13>
-                </p>
-                <input type="text" class="form-control form-control-alternative"
-                       placeholder=""
-                       v-model="save_intermediates_to"
-                       :class="{ 'is-invalid': error.save_intermediates_to }">
-                <div class="invalid-feedback">[[ error.save_intermediates_to ]]</div>
+                <div class="my-3">
+                    <p class="font-h5 font-semibold mb-1">Save intermediates to<span class="text-gray-600 font-h6 font-weight-400 ml-1">(optional)</span></p>
+                    <input type="text" class="form-control form-control-alternative"
+                           placeholder=""
+                           v-model="save_intermediates_to"
+                           :class="{ 'is-invalid': error.save_intermediates_to }">
+                    <div class="invalid-feedback">[[ error.save_intermediates_to ]]</div>
+                </div>
             </div>
         </template>
         <template #footer>
