@@ -11,7 +11,7 @@ const ZapIntegration = {
     class="modal modal-small fixed-left fade shadow-sm" tabindex="-1" role="dialog"
 >
     <ModalDialog
-            v-model:description="description"
+            v-model:name="config.name"
             v-model:is_default="is_default"
             @update="update"
             @create="create"
@@ -37,7 +37,7 @@ const ZapIntegration = {
                                 all
                             </h9>
                         </label>
-                        <label class="custom-checkbox d-flex align-items-center mr-3" 
+                        <label class="custom-checkbox d-flex align-items-center mr-3"
                             v-for="st in available_scan_types" :key="st">
                             <input type="checkbox"
                                    @change="e => handleScanTypeCheck(st, e.target.checked)"
@@ -50,7 +50,7 @@ const ZapIntegration = {
                     </div>
                     <div class="invalid-feedback">[[ error.scan_types ]]</div>
                 </div>
-        
+
                 <div class="form-group form-row">
                     <div class="col-6">
                         <h9>Login</h9>
@@ -64,7 +64,7 @@ const ZapIntegration = {
                         <div class="invalid-feedback">[[ error.auth_login ]]</div>
                     </div>
                     <div class="col-6">
-        
+
                         <h9>Password</h9>
                         <p>
                             <h13>Optional</h13>
@@ -90,8 +90,8 @@ const ZapIntegration = {
                         <div class="invalid-feedback">[[ error.auth_script ]]</div>
                     </div>
                 </div>
-                
-                
+
+
                 <h9>Java options</h9>
                 <p>
                     <h13>Optional</h13>
@@ -101,7 +101,7 @@ const ZapIntegration = {
                        v-model="java_options"
                        :class="{ 'is-invalid': error.java_options }">
                 <div class="invalid-feedback">[[ error.java_options ]]</div>
-        
+
                 <div class="form-group form-row">
                     <div class="col-6">
                         <h9>Passive scan wait threshold</h9>
@@ -137,7 +137,7 @@ const ZapIntegration = {
                        v-model="external_zap_daemon"
                        :class="{ 'is-invalid': error.external_zap_daemon }">
                 <div class="invalid-feedback">[[ error.external_zap_daemon ]]</div>
-                
+
                 <h9>External zap api key</h9>
                 <p>
                     <h13>Optional</h13>
@@ -147,7 +147,7 @@ const ZapIntegration = {
                        v-model="external_zap_api_key"
                        :class="{ 'is-invalid': error.external_zap_api_key }">
                 <div class="invalid-feedback">[[ error.external_zap_api_key ]]</div>
-                
+
                 <h9>Save intermediates to</h9>
                 <p>
                     <h13>Optional</h13>
@@ -189,7 +189,7 @@ const ZapIntegration = {
         },
         body_data() {
             const {
-                description,
+                config,
                 is_default,
                 project_id,
                 scan_types,
@@ -208,7 +208,7 @@ const ZapIntegration = {
                 status
             } = this
             return {
-                description,
+                config,
                 is_default,
                 project_id,
 
@@ -261,8 +261,8 @@ const ZapIntegration = {
         },
         handleEdit(data) {
             console.debug('ZAP editIntegration', data)
-            const {description, is_default, id, settings} = data
-            this.load({...settings, description, is_default, id})
+            const {config, is_default, id, settings} = data
+            this.load({...settings, config, is_default, id})
             this.modal.modal('show')
         },
         handleDelete(id) {
@@ -338,7 +338,7 @@ const ZapIntegration = {
             }
         },
         initialState: () => ({
-            description: '',
+            config: {},
             is_default: false,
             is_fetching: false,
             error: {},

@@ -8,7 +8,7 @@ const ZapIntegration = {
     computed: {
         body_data() {
             const {
-                description,
+                config,
                 is_default,
                 selected_integration: id,
 
@@ -23,7 +23,7 @@ const ZapIntegration = {
                 passive_scan_wait_limit,
             } = this
             return {
-                description,
+                config,
                 is_default,
                 id,
 
@@ -258,4 +258,3 @@ const ZapIntegration = {
 
 
 register_component('scanner-zap', ZapIntegration)
-
