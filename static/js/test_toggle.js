@@ -173,10 +173,10 @@ const ZapIntegration = {
                         <p>
                             <h13>Optional</h13>
                         </p>
-                        <input type="password" class="form-control form-control-alternative"
+                        <SecretFieldInput
                                placeholder="Password"
                                v-model="auth_password"
-                               :class="{ 'is-invalid': error.password }">
+                        >
                         <div class="invalid-feedback">[[ error.password ]]</div>
                     </div>
                     <div class="col-12">
