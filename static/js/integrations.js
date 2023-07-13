@@ -161,7 +161,7 @@ const ZapIntegration = {
         </template>
         <template #footer>
             <test-connection-button
-                    :apiPath="api_base + 'check_settings'"
+                    :apiPath="this.$root.build_api_url('integrations', 'check_settings') + '/' + pluginName"
                     :error="error.check_connection"
                     :body_data="body_data"
                     v-model:is_fetching="is_fetching"
@@ -181,9 +181,6 @@ const ZapIntegration = {
         })
     },
     computed: {
-        apiPath() {
-            return this.api_base + 'integration/'
-        },
         project_id() {
             return getSelectedProjectId()
         },
@@ -269,6 +266,10 @@ const ZapIntegration = {
             this.load({id})
             this.delete()
         },
+        handleSetDefault(id, local=true) {
+            this.load({id})
+            this.set_default(local)
+        },
         create() {
             this.is_fetching = true
             fetch(this.apiPath + this.pluginName, {
@@ -317,12 +318,13 @@ const ZapIntegration = {
         },
         delete() {
             this.is_fetching = true
-            fetch(this.apiPath + this.id, {
+            fetch(this.apiPath + this.project_id + '/'+ this.id, {
                 method: 'DELETE',
             }).then(response => {
                 this.is_fetching = false
                 if (response.ok) {
-                     this.$emit('update', {...this.$data, section_name: this.section_name})
+                    delete this.$data['id']
+                    this.$emit('update', {...this.$data, section_name: this.section_name})
                 } else {
                     this.handleError(response)
                     alertMain.add(`Deletion error. <button class="btn btn-primary" @click="modal.modal('show')">Open modal<button>`)
@@ -335,6 +337,28 @@ const ZapIntegration = {
             } else {
                 const i = this.scan_types.indexOf(value)
                 this.scan_types.splice(i, 1)
+            }
+        },
+        async set_default(local) {
+            this.is_fetching = true
+            console.log(JSON.stringify({local}))
+            try {
+                const resp = await fetch(this.apiPath + this.project_id + '/' + this.id, {
+                    method: 'PATCH',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({local})
+                })
+                if (resp.ok) {
+                    this.$emit('update', {...this.$data, section_name: this.section_name})
+                } else {
+                    const error_data = await resp.json()
+                    this.handleError(error_data)
+                }
+            } catch (e) {
+                console.error(e)
+                showNotify('ERROR', 'Error setting as default')
+            } finally {
+                this.is_fetching = false
             }
         },
         initialState: () => ({
@@ -372,7 +396,7 @@ const ZapIntegration = {
             save_intermediates_to: '/data/intermediates/dast',
 
             pluginName: 'security_scanner_zap',
-            api_base: '/api/v1/integrations/',
+            apiPath: V.build_api_url('integrations', 'integration') + '/',
 
             status: integration_status.success,
         }),

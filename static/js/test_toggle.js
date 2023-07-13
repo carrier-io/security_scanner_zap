@@ -98,7 +98,7 @@ const ZapIntegration = {
 
         initialState: () => ({
             // toggle: false,
-
+            config: {},
             error: {},
 
             available_scan_types: ['xss', 'sqli'],
