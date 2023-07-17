@@ -1,3 +1,4 @@
 {% set integration_name = 'security_scanner_zap' %}
 
+<script src="{{ url_for('integrations.static', filename='js/configuration.js') }}"></script>
 <script src="{{ url_for('%s.static' | format(integration_name), filename='js/test_toggle.js') }}"></script>

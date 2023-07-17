@@ -5,6 +5,9 @@ const ZapIntegration = {
     data() {
         return this.initialState()
     },
+    components: {
+        SecretFieldInput: SecretFieldInput
+    },
     computed: {
         body_data() {
             const {
@@ -98,7 +101,7 @@ const ZapIntegration = {
 
         initialState: () => ({
             // toggle: false,
-
+            config: {},
             error: {},
 
             available_scan_types: ['xss', 'sqli'],
@@ -176,7 +179,7 @@ const ZapIntegration = {
                         <SecretFieldInput
                                placeholder="Password"
                                v-model="auth_password"
-                        >
+                        />
                         <div class="invalid-feedback">[[ error.password ]]</div>
                     </div>
                     <div class="col-12">
