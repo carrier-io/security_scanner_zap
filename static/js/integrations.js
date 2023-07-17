@@ -373,10 +373,7 @@ const ZapIntegration = {
             scan_types: ['xss', 'sqli'],
 
             auth_login: 'user',
-            auth_password: {
-                value: '',
-                from_secrets: false
-            },
+            auth_password: '',
             auth_script: "- {command: open, target: '%Target%/login', value: ''}\n" +
                 "- {command: waitForElementPresent, target: id=login_login, value: ''}\n" +
                 "- {command: waitForElementPresent, target: id=login_password, value: ''}\n" +
