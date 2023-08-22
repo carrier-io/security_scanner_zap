@@ -41,7 +41,7 @@ class RPC:
             drop_keys.append("external_zap_api_key")
         #
         for key in drop_keys:
-            scanner_params.pop(key)
+            scanner_params.pop(key, None)
         #
         result = {
             "target": test_params["urls_to_scan"][0],
