@@ -16,6 +16,7 @@ const ZapIntegration = {
                 selected_integration: id,
 
                 scan_types,
+                use_auth,
                 auth_login,
                 auth_password,
                 auth_script,
@@ -24,6 +25,9 @@ const ZapIntegration = {
                 java_options,
                 passive_scan_wait_threshold,
                 passive_scan_wait_limit,
+                use_external_zap,
+                external_zap_daemon,
+                external_zap_api_key,
             } = this
             return {
                 config,
@@ -31,6 +35,7 @@ const ZapIntegration = {
                 id,
 
                 scan_types,
+                use_auth,
                 auth_login,
                 auth_password,
                 auth_script,
@@ -39,6 +44,9 @@ const ZapIntegration = {
                 java_options,
                 passive_scan_wait_threshold,
                 passive_scan_wait_limit,
+                use_external_zap,
+                external_zap_daemon,
+                external_zap_api_key,
             }
         },
         scan_types_indeterminate() {
@@ -107,6 +115,7 @@ const ZapIntegration = {
             available_scan_types: ['xss', 'sqli'],
             scan_types: [],
 
+            use_auth: false,
             auth_login: '',
             auth_password: '',
             auth_script: '',
@@ -115,6 +124,9 @@ const ZapIntegration = {
             java_options: '',
             passive_scan_wait_threshold: 0,
             passive_scan_wait_limit: 600,
+            use_external_zap: false,
+            external_zap_daemon: 'http://192.168.0.2:8091',
+            external_zap_api_key: 'dusty',
         })
     },
     template: `

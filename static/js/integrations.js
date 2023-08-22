@@ -229,6 +229,7 @@ const ZapIntegration = {
                 is_default,
                 project_id,
                 scan_types,
+                use_auth,
                 auth_login,
                 auth_password,
                 auth_script,
@@ -238,9 +239,10 @@ const ZapIntegration = {
                 split_by_endpoint,
                 passive_scan_wait_threshold,
                 passive_scan_wait_limit,
+                use_external_zap,
                 external_zap_daemon,
                 external_zap_api_key,
-                save_intermediates_to,
+                // save_intermediates_to,
                 status
             } = this
             return {
@@ -249,6 +251,7 @@ const ZapIntegration = {
                 project_id,
 
                 scan_types,
+                use_auth,
                 auth_login,
                 auth_password,
                 auth_script,
@@ -258,9 +261,10 @@ const ZapIntegration = {
                 split_by_endpoint,
                 passive_scan_wait_threshold,
                 passive_scan_wait_limit,
+                use_external_zap,
                 external_zap_daemon,
                 external_zap_api_key,
-                save_intermediates_to,
+                // save_intermediates_to,
                 status
             }
         },
@@ -411,6 +415,7 @@ const ZapIntegration = {
             available_scan_types: ['xss', 'sqli'],
             scan_types: ['xss', 'sqli'],
 
+            use_auth: false,
             auth_login: 'user',
             auth_password: '',
             auth_script: "- {command: open, target: '%Target%/login', value: ''}\n" +
@@ -427,9 +432,10 @@ const ZapIntegration = {
             passive_scan_wait_threshold: 0,
             passive_scan_wait_limit: 600,
 
+            use_external_zap: false,
             external_zap_daemon: 'http://192.168.0.2:8091',
             external_zap_api_key: 'dusty',
-            save_intermediates_to: '/data/intermediates/dast',
+            // save_intermediates_to: '/data/intermediates/dast',
 
             pluginName: 'security_scanner_zap',
             apiPath: V.build_api_url('integrations', 'integration') + '/',
