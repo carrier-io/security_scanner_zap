@@ -12,6 +12,7 @@ from ...integrations.models.pd.integration import SecretField
 class IntegrationModel(BaseModel):
 
     scan_types: List[str] = ['xss', 'sqli']
+    use_auth: Optional[bool] = False
     auth_login: Optional[str] = 'user'
     auth_password: Union[SecretField, str, None] = ''
     auth_script: Optional[str] = """
@@ -31,9 +32,10 @@ class IntegrationModel(BaseModel):
     passive_scan_wait_threshold: Optional[int] = 0
     passive_scan_wait_limit: Optional[int] = 600
 
+    use_external_zap: Optional[bool] = False
     external_zap_daemon: Optional[AnyUrl] = 'http://192.168.0.2:8091'
     external_zap_api_key: Optional[str] = 'dusty'
-    save_intermediates_to: Optional[str] = '/data/intermediates/dast'
+    # save_intermediates_to: Optional[str] = '/data/intermediates/dast'
 
     def check_connection(self, **kwargs) -> bool:
         try:

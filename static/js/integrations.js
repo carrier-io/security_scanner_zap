@@ -53,6 +53,14 @@ const ZapIntegration = {
 
                 <div class="form-group form-row">
                     <div class="col-6">
+                      <label class="custom-checkbox align-items-center mr-3">
+                        <input type="checkbox" v-model="use_auth">
+                        <h9 class="ml-1">
+                            Use auth
+                        </h9>
+                      </label>
+                    </div>
+                    <div class="col-6">
                         <h9>Login</h9>
                         <p>
                             <h13>Optional</h13>
@@ -128,6 +136,14 @@ const ZapIntegration = {
                         <div class="invalid-feedback">[[ error.passive_scan_wait_limit ]]</div>
                     </div>
                 </div>
+                <div class="col-6">
+                  <label class="custom-checkbox align-items-center mr-3">
+                    <input type="checkbox" v-model="use_external_zap">
+                    <h9 class="ml-1">
+                        Use external ZAP daemon
+                    </h9>
+                  </label>
+                </div>
                 <h9>External zap daemon</h9>
                 <p>
                     <h13>Optional</h13>
@@ -148,7 +164,7 @@ const ZapIntegration = {
                        :class="{ 'is-invalid': error.external_zap_api_key }">
                 <div class="invalid-feedback">[[ error.external_zap_api_key ]]</div>
 
-                <h9>Save intermediates to</h9>
+                <!--<h9>Save intermediates to</h9>
                 <p>
                     <h13>Optional</h13>
                 </p>
@@ -156,7 +172,7 @@ const ZapIntegration = {
                        placeholder=""
                        v-model="save_intermediates_to"
                        :class="{ 'is-invalid': error.save_intermediates_to }">
-                <div class="invalid-feedback">[[ error.save_intermediates_to ]]</div>
+                <div class="invalid-feedback">[[ error.save_intermediates_to ]]</div>-->
             </div>
         </template>
         <template #footer>
