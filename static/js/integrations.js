@@ -100,6 +100,26 @@ const ZapIntegration = {
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <div class="form-check">
+                        <label>
+                            <input class="form-check-input" type="checkbox"
+                                   v-model="bind_all_interfaces">
+                            <h9>
+                                Bind all interfaces
+                            </h9>
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label>
+                            <input class="form-check-input" type="checkbox"
+                                   v-model="daemon_debug">
+                            <h9>
+                                Daemon debug
+                            </h9>
+                        </label>
+                    </div>
+                </div>
 
                 <h9>Java options</h9>
                 <p>
