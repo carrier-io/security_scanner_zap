@@ -22,12 +22,13 @@ class RPC:
         else:
             scanner_params["scan_types"] = ",".join(list(scanner_params["scan_types"]))
         #
-        if not scanner_params["auth_password"]["from_secrets"]:
-            scanner_params["auth_password"] = scanner_params["auth_password"]["value"]
-        else:
-            scanner_params["auth_password"] = vault_client.unsecret(
-                scanner_params["auth_password"]["value"]
-            )
+        if isinstance(scanner_params["auth_password"], dict):
+            if not scanner_params["auth_password"]["from_secrets"]:
+                scanner_params["auth_password"] = scanner_params["auth_password"]["value"]
+            else:
+                scanner_params["auth_password"] = vault_client.unsecret(
+                    scanner_params["auth_password"]["value"]
+                )
         #
         drop_keys = ["config", "id", "use_auth", "use_external_zap"]
         #
