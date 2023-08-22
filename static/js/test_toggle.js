@@ -123,7 +123,7 @@ const ZapIntegration = {
             daemon_debug: false,
             java_options: '',
             passive_scan_wait_threshold: 0,
-            passive_scan_wait_limit: 600,
+            passive_scan_wait_limit: 3600,
             use_external_zap: false,
             external_zap_daemon: 'http://192.168.0.2:8091',
             external_zap_api_key: 'dusty',

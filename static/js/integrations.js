@@ -430,7 +430,7 @@ const ZapIntegration = {
             java_options: '-Xmx1g',
             split_by_endpoint: false,
             passive_scan_wait_threshold: 0,
-            passive_scan_wait_limit: 600,
+            passive_scan_wait_limit: 3600,
 
             use_external_zap: false,
             external_zap_daemon: 'http://192.168.0.2:8091',
